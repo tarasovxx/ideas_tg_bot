@@ -2,16 +2,16 @@ FROM python:3.11-bookworm
 
 WORKDIR /app
 
-# Настройка российского зеркала PyPI
-RUN pip config set global.index-url https://pypi.python.org/simple/ && \
-    pip config set global.trusted-host pypi.python.org && \
-    pip config set global.timeout 300
+# Используйте зеркало Tsinghua University (Китай - быстрое)
+RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple/ && \
+    pip config set global.trusted-host pypi.tuna.tsinghua.edu.cn && \
+    pip config set global.timeout 600 && \
+    pip config set global.retries 10
 
 COPY pyproject.toml poetry.lock ./
 
-RUN pip install --timeout=300 poetry && \
+RUN pip install --timeout=600 --retries=10 poetry && \
     poetry config virtualenvs.create false && \
-    poetry config repositories.default https://pypi.python.org/simple/ && \
     poetry install --no-interaction --no-ansi --no-root
 
 COPY bot/ ./bot/
