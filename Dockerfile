@@ -2,15 +2,15 @@ FROM python:3.11-bookworm
 
 WORKDIR /app
 
-# Используйте зеркало Tsinghua University (Китай - быстрое)
-RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple/ && \
-    pip config set global.trusted-host pypi.tuna.tsinghua.edu.cn && \
+# Отключаем IPv6 для pip
+RUN echo "net.ipv6.conf.all.disable_ipv6 = 1" >> /etc/sysctl.conf && \
+    echo "net.ipv6.conf.default.disable_ipv6 = 1" >> /etc/sysctl.conf && \
     pip config set global.timeout 600 && \
-    pip config set global.retries 10
+    pip config set global.retries 5
 
 COPY pyproject.toml poetry.lock ./
 
-RUN pip install --timeout=600 --retries=10 poetry && \
+RUN pip install --timeout=600 --retries=5 --force-reinstall --prefer-binary poetry && \
     poetry config virtualenvs.create false && \
     poetry install --no-interaction --no-ansi --no-root
 
